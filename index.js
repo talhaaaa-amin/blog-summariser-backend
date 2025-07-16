@@ -7,10 +7,25 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors()); // Allows all origins
+// ✅ Use CORS (restrict in production)
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://nexium-muhammad-talha-amin-assignment-2.vercel.app",
+    ],
+    methods: ["POST"],
+  })
+);
 
 // ✅ Body parser
 app.use(express.json());
+
+// 🔍 Log incoming requests
+app.use((req, res, next) => {
+  console.log(`📨 ${req.method} ${req.url}`);
+  next();
+});
 
 // ✅ Test route
 app.get("/", (req, res) => {
