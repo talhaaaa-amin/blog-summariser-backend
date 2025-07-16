@@ -7,16 +7,7 @@ dotenv.config();
 
 const app = express();
 
-// ✅ Use CORS with frontend domain (localhost + Vercel)
-app.use(
-  cors({
-    origin: [
-      "http://localhost:5173",
-      "https://nexium-muhammad-talha-amin-assignment-2.vercel.app",
-    ],
-    methods: ["GET", "POST"],
-  })
-);
+app.use(cors()); // Allows all origins
 
 // ✅ Body parser
 app.use(express.json());
