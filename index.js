@@ -9,11 +9,15 @@ dotenv.config();
 const app = express();
 app.use(
   cors({
-    origin: "http://localhost:3000", // only allow your frontend
+    origin: [
+      "http://localhost:3000",
+      "https://nexium-muhammad-talha-amin-assignment-2.vercel.app",
+    ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
 );
+
 // In index.js
 app.get("/", (req, res) => {
   res.send("✅ Blog Summariser API is running");
