@@ -1,17 +1,17 @@
 const express = require("express");
 const router = express.Router();
-require("dotenv").config(); // ✅ Load environment variables
+require("dotenv").config(); // Load environment variables
 
 const { summarizeText } = require("../utils/summarize");
 const { translateToUrdu } = require("../utils/translate");
 const { createClient } = require("@supabase/supabase-js");
 const mongoose = require("mongoose");
 
-// ✅ Connect to MongoDB
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ Connected to MongoDB"))
-  .catch((err) => console.error("❌ MongoDB connection error:", err.message));
+// ✅ Connect to MongoDB (do this once only!)
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
 // ✅ MongoDB Schema
 const FullText = mongoose.model(
@@ -22,49 +22,49 @@ const FullText = mongoose.model(
   })
 );
 
-// ✅ Create Supabase client with error check
-if (!process.env.SUPABASE_URL || !process.env.SUPABASE_KEY) {
-  throw new Error("❌ Supabase environment variables are missing.");
-}
-
+// ✅ Supabase client
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_KEY
 );
 
-console.log("✅ Supabase client initialized");
-
-// ✅ POST route for summarizing
+// ✅ POST /api/summarize
 router.post("/", async (req, res) => {
-  const { url } = req.body;
-
-  if (!url) {
-    return res.status(400).json({ error: "URL is required." });
-  }
-
-  // Fake scraping logic (static content for now)
-  const scraped = `This is some dummy content from ${url}. It has multiple sentences. Here's another one. And more content.`;
-
-  const summary = summarizeText(scraped);
-  const urdu = translateToUrdu(summary);
-
   try {
-    // Save full blog in MongoDB
+    const { url } = req.body;
+
+    if (!url || typeof url !== "string") {
+      return res.status(400).json({ error: "Invalid URL." });
+    }
+
+    // ⚙️ Fake scraping logic
+    const scraped = `This is fake content scraped from ${url}. It has multiple sentences. Here's another one. More content follows.`;
+
+    // 🧠 AI-style summary
+    const summary = summarizeText(scraped);
+
+    // 🌐 Translate to Urdu
+    const urdu = translateToUrdu(summary);
+
+    // 💾 Save full content in MongoDB
     await FullText.create({ url, content: scraped });
 
-    // Save summary + Urdu in Supabase
+    // 📝 Save summary in Supabase
     const { error } = await supabase
       .from("summaries")
       .insert([{ url, summary, translated: urdu }]);
 
     if (error) {
-      throw new Error(`Supabase insert error: ${error.message}`);
+      console.error("🔴 Supabase insert error:", error);
+      return res
+        .status(500)
+        .json({ error: "Failed to save summary in Supabase." });
     }
 
-    // Return both
+    // ✅ Success
     res.json({ summary, urdu });
   } catch (err) {
-    console.error("❌ Error in summarize route:", err.message);
+    console.error("🔴 BACKEND ERROR:", err);
     res.status(500).json({ error: "Something went wrong." });
   }
 });
