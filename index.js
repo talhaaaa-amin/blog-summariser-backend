@@ -7,14 +7,15 @@ dotenv.config();
 
 const app = express();
 
-// ✅ Use CORS (restrict in production)
+// ✅ Use CORS (allow frontend domain + headers)
 app.use(
   cors({
     origin: [
       "http://localhost:5173",
       "https://nexium-muhammad-talha-amin-assignment-2.vercel.app",
     ],
-    methods: ["POST"],
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type"],
   })
 );
 
