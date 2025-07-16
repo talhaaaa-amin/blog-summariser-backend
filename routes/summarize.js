@@ -13,12 +13,13 @@ mongoose.connect(process.env.MONGO_URI, {
   useUnifiedTopology: true,
 });
 
-// ✅ MongoDB Schema
+// ✅ MongoDB Schema (explicitly use 'blogs' collection)
 const FullText = mongoose.model(
-  "FullText",
+  "blogs", // 👈 this ensures it uses the 'blogs' collection
   new mongoose.Schema({
     url: String,
     content: String,
+    createdAt: { type: Date, default: Date.now }, // optional timestamp
   })
 );
 
@@ -70,4 +71,3 @@ router.post("/", async (req, res) => {
 });
 
 module.exports = router;
-// https://example.com/blog/how-to-learn-programming
