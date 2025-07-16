@@ -62,8 +62,7 @@ router.post("/", async (req, res) => {
         .json({ error: "Failed to save summary in Supabase." });
     }
 
-    // ✅ Success
-    res.json({ summary, urdu });
+    res.status(200).json({ summary, urdu }); // ✅ always send a response
   } catch (err) {
     console.error("🔴 BACKEND ERROR:", err);
     res.status(500).json({ error: "Something went wrong." });
