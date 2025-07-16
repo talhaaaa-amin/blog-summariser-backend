@@ -14,6 +14,10 @@ app.use(
     credentials: true,
   })
 );
+// In index.js
+app.get("/", (req, res) => {
+  res.send("✅ Blog Summariser API is running");
+});
 
 app.use(express.json());
 
